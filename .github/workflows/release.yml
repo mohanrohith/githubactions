@@ -15,7 +15,7 @@ jobs:
     
     - name: Get the SHA
       id: sha
-      uses: actions/github-script@v4
+      uses: actions/github-script@v5
       with:
         result-encoding: string
         script: |
@@ -30,8 +30,13 @@ jobs:
     # - uses: actions/checkout@v2
     #   with:
     #     ref: ${{ steps.sha.outputs.result }}
+    - name: Test json stringify
+      id: testfnc
+      run: |
+        SOME_OUTPUT='i am someone special yooo' 
+        echo ::set-output name=some_output::"$SOME_OUTPUT"
 
-    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.sha.outputs.result}}"
+    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.some_output}}"
 
     - name: React to comment
       uses: actions/github-script@v4
