@@ -15,7 +15,7 @@ jobs:
     
     - name: Get the SHA
       id: sha
-      uses: actions/github-script@v5
+      uses: actions/github-script@v4
       with:
         result-encoding: string
         script: |
