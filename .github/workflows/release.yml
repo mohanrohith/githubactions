@@ -40,7 +40,8 @@ jobs:
         echo ::set-output name=version::"$CURRENT_VERSION"
         echo ::set-output name=build::"$CURRENT_BUILD"
 
-    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
+    - name: Test the output
+      run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
 
     - name: React to comment
       uses: actions/github-script@v4
