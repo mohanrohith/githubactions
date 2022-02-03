@@ -1,4 +1,4 @@
-name: Release app
+learname: Release app
 
 on:
   issue_comment:
@@ -40,6 +40,10 @@ jobs:
 
         echo ::set-output name=version::"$CURRENT_VERSION"
         echo ::set-output name=build::"$BUILD"
+
+        echo "Updating package.json"
+        VER="${CURRENT_VERSION}"; sed -i "" "s|version\":.*|version\": \"${VER}\",|" package.json
+        BUILD="${BUILD}"; sed -i "" "s|build\":.*|build\": \"${BUILD}\",|" package.json
 
     - name: Test the output
       run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
