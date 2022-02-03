@@ -1,6 +1,7 @@
 {
   "name": "githubactions",
   "version": "0.0.1",
+  "build": 1001,
   "private": true,
   "scripts": {
     "android": "react-native run-android",

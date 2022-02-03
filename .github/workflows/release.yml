@@ -27,16 +27,20 @@ jobs:
           });
           return pr.data.head.sha
 
-    # - uses: actions/checkout@v2
-    #   with:
-    #     ref: ${{ steps.sha.outputs.result }}
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.sha.outputs.result }}
+
     - name: Test json stringify
       id: testfnc
       run: |
-        SOME_OUTPUT='i am someone special yooo' 
-        echo ::set-output name=some_output::"$SOME_OUTPUT"
+        CURRENT_VERSION=$(jq .version package.json | sed 's:^.\(.*\).$:\1:')
+        CURRENT_BUILD=$(jq .build package.json | sed 's:^.\(.*\).$:\1:')
 
-    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.some_output}}"
+        echo ::set-output name=version::"$CURRENT_VERSION"
+        echo ::set-output name=build::"$CURRENT_BUILD"
+
+    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
 
     - name: React to comment
       uses: actions/github-script@v4
