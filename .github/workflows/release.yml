@@ -27,9 +27,11 @@ jobs:
           });
           return pr.data.head.sha
 
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ steps.sha.outputs.result }}
+    # - uses: actions/checkout@v2
+    #   with:
+    #     ref: ${{ steps.sha.outputs.result }}
+
+    - run: echo "::debug::Set the Octocat variable  ===> ${{steps.sha.outputs.result}}"
 
     - name: React to comment
       uses: actions/github-script@v4
