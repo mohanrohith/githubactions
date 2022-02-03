@@ -1,4 +1,4 @@
-learname: Release app
+name: Release app
 
 on:
   issue_comment:
