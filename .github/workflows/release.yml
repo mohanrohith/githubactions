@@ -36,12 +36,20 @@ jobs:
       run: |
         CURRENT_VERSION=$(jq .version package.json | sed 's:^.\(.*\).$:\1:')
         CURRENT_BUILD=$(jq .build package.json | sed 's:^.\(.*\).$:\1:')
+        BUILD=$((${CURRENT_BUILD}+1))
 
         echo ::set-output name=version::"$CURRENT_VERSION"
-        echo ::set-output name=build::"$CURRENT_BUILD"
+        echo ::set-output name=build::"$BUILD"
 
     - name: Test the output
       run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
+
+    - name: Tag and commit
+      uses: EndBug/add-and-commit@v8
+      with:
+        tag: "v${{steps.testfnc.outputs.version}}-${{steps.testfnc.outputs.build}}"
+        message: 'Version updated to ${{steps.testfnc.outputs.version}}(${{steps.testfnc.outputs.build}})'
+        push: true
 
     - name: React to comment
       uses: actions/github-script@v4
