@@ -55,11 +55,19 @@ jobs:
         echo "::debug::comment-branch:${{steps.comment-branch.outputs.head_ref}}"
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
 
-    - uses: yanamura/ios-bump-version@v1
+    - name: Bump iOS version
+      uses: yanamura/ios-bump-version@v1
       with:
         version: ${{steps.testfnc.outputs.version}}
         build-number: ${{steps.testfnc.outputs.build}}
         project-path: ios #Example for React Native project
+
+    - name: Bump Android version
+      uses: chkfung/android-version-actions@v1.1
+      with:
+        gradlePath: android/app/build.gradle
+        versionCode: ${{steps.testfnc.outputs.build}}
+        versionName: ${{steps.testfnc.outputs.version}}(${{steps.testfnc.outputs.build}})
 
     - name: Check git status after 
       run: |
