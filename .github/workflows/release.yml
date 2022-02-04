@@ -65,7 +65,9 @@ jobs:
     - name: Bump iOS version myself
       run: |
         sed -i '' -e 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{steps.testfnc.outputs.version}};/' ios/githubactions.xcodeproj/project.pbxproj
+        cd ios
         xcrun agvtool new-version ${{steps.testfnc.outputs.build}}
+        cd ..
 
     - name: Bump Android version
       uses: chkfung/android-version-actions@v1.1
