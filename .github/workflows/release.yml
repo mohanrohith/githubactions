@@ -13,9 +13,9 @@ jobs:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
     
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
 
     - name: Get current version info and update it
       id: testfnc
@@ -40,7 +40,7 @@ jobs:
     - name: Test the output
       run: |
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
-        echo "::debug::REF:${{github.head_ref}}"
+        echo "::debug::REF:${{github.ref}}"
 
 
     # - name: Tag and commit
