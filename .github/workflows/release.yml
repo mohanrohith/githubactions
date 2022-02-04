@@ -15,6 +15,11 @@ jobs:
     
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
       
 
     - name: Get current version info and update it
@@ -36,11 +41,18 @@ jobs:
       run: |
         echo "::debug::Show package.json"
         cat package.json
+
+    - name: Output Github context
+      uses: actions/github-script@v4
+      with:
+        script: |
+          console.log(github);
         
     - name: Test the output
       run: |
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
         echo "::debug::REF:${{github.ref}}"
+        echo "::debug::extract_branch.branch:${{steps.extract_branch.branch}}"
 
 
     # - name: Tag and commit
