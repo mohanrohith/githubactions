@@ -43,6 +43,8 @@ jobs:
 
         echo "::debug:: Updating package.json"
         ls
+        VER="${CURRENT_VERSION}"; sed -i "" "s|version\":.*|version\": \"${VER}\",|" package.json
+        cat package.json
         
 
     - name: Test the output
