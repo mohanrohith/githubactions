@@ -55,12 +55,17 @@ jobs:
         echo "::debug::comment-branch:${{steps.comment-branch.outputs.head_ref}}"
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
 
-    - name: Bump iOS version
-      uses: yanamura/ios-bump-version@v1
-      with:
-        version: ${{steps.testfnc.outputs.version}}
-        build-number: ${{steps.testfnc.outputs.build}}
-        project-path: ios #Example for React Native project
+    # - name: Bump iOS version
+    #   uses: yanamura/ios-bump-version@v1
+    #   with:
+    #     version: ${{steps.testfnc.outputs.version}}
+    #     build-number: ${{steps.testfnc.outputs.build}}
+    #     project-path: ios #Example for React Native project
+
+    - name: Bump iOS version myself
+      run: |
+        sed -i '' -e 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{steps.testfnc.outputs.version}};/' ios/githubactions.xcodeproj/project.pbxproj
+        xcrun agvtool new-version ${{steps.testfnc.outputs.build}}
 
     - name: Bump Android version
       uses: chkfung/android-version-actions@v1.1
