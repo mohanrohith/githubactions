@@ -12,16 +12,16 @@ jobs:
     
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
+
+    - name: Get current branch
+      uses: xt0rted/pull-request-comment-branch@v1
+      id: comment-branch
     
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-      
-
+      with:
+        ref: ${{ steps.comment-branch.outputs.head_ref }}
+    
     - name: Get current version info and update it
       id: testfnc
       run: |
@@ -41,12 +41,6 @@ jobs:
       run: |
         echo "::debug::Show package.json"
         cat package.json
-
-    # - name: Output Github context
-    #   uses: actions/github-script@v4
-    #   with:
-    #     script: |
-    #       console.log(github);
         
     - name: Test the output
       run: |
@@ -58,8 +52,7 @@ jobs:
         echo "::debug::ref_name:${{github.ref_name}}"
         echo "::debug::ref_type:${{github.ref_type}}"
         echo "::debug::sha:${{github.sha}}"
-
-        echo "::debug::extract_branch.branch:${{steps.extract_branch.branch}}"
+        echo "::debug::comment-branch:${{steps.comment-branch.outputs.head_ref}}"
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
 
 
