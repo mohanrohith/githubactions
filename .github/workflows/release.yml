@@ -42,17 +42,25 @@ jobs:
         echo "::debug::Show package.json"
         cat package.json
 
-    - name: Output Github context
-      uses: actions/github-script@v4
-      with:
-        script: |
-          console.log(github);
+    # - name: Output Github context
+    #   uses: actions/github-script@v4
+    #   with:
+    #     script: |
+    #       console.log(github);
         
     - name: Test the output
       run: |
-        echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
-        echo "::debug::REF:${{github.ref}}"
+        echo "::debug::github.event_name: ${{github.event_name}}"
+        echo "::debug::action_ref:${{github.action_ref}}"
+        echo "::debug::ref:${{github.ref}}"
+        echo "::debug::head_ref:${{github.head_ref}}"
+        echo "::debug::base_ref:${{github.base_ref}}"
+        echo "::debug::ref_name:${{github.ref_name}}"
+        echo "::debug::ref_type:${{github.ref_type}}"
+        echo "::debug::sha:${{github.sha}}"
+
         echo "::debug::extract_branch.branch:${{steps.extract_branch.branch}}"
+        echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
 
 
     # - name: Tag and commit
