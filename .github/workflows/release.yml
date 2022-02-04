@@ -13,23 +13,28 @@ jobs:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
     
-    - name: Get the SHA
-      id: sha
-      uses: actions/github-script@v4
-      with:
-        result-encoding: string
-        script: |
-          const { owner, repo, number } = context.issue;
-          const pr = await github.pulls.get({
-            owner,
-            repo,
-            pull_number: number,
-          });
-          return pr.data.head.sha
+    # - name: Get the SHA
+    #   id: sha
+    #   uses: actions/github-script@v4
+    #   with:
+    #     result-encoding: string
+    #     script: |
+    #       const { owner, repo, number } = context.issue;
+    #       const pr = await github.pulls.get({
+    #         owner,
+    #         repo,
+    #         pull_number: number,
+    #       });
+    #       return pr.data.head.sha
+    - name: Extract branch name
+      # run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      run: echo ::set-output name=branch::"${GITHUB_REF#refs/heads/}"
+      id: extract_branch
 
     - uses: actions/checkout@v2
       with:
-        ref: ${{ steps.sha.outputs.result }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Test json stringify
       id: testfnc
@@ -51,7 +56,6 @@ jobs:
         echo "::debug::Show package.json"
         cat package.json
         
-
     - name: Test the output
       run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
 
@@ -60,7 +64,7 @@ jobs:
       with:
         tag: "v${{steps.testfnc.outputs.version}}-${{steps.testfnc.outputs.build}}"
         message: 'Version updated to ${{steps.testfnc.outputs.version}}(${{steps.testfnc.outputs.build}})'
-        push: true
+        push: "origin ${{steps.extract_branch.branch}} --force"
 
     - name: React to comment
       uses: actions/github-script@v4
