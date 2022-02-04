@@ -41,9 +41,14 @@ jobs:
         echo ::set-output name=version::"$CURRENT_VERSION"
         echo ::set-output name=build::"$BUILD"
 
-        echo "::debug:: Updating package.json"
-        ls
+        echo "::debug::Updating package.json with ${CURRENT_VERSION} ${BUILD}"
+        
         VER="${CURRENT_VERSION}"; sed -i "" "s|version\":.*|version\": \"${VER}\",|" package.json
+        BUILD="${BUILD}"; sed -i "" "s|build\":.*|build\": \"${BUILD}\",|" package.json
+
+    - name: Updated package.json
+      run: |
+        echo "::debug::Show package.json"
         cat package.json
         
 
