@@ -13,16 +13,11 @@ jobs:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
     
-    - name: Extract branch name
-      run: echo ::set-output name=branch::"${GITHUB_REF#refs/heads/}"
-      id: extract_branch
-
     - uses: actions/checkout@v2
       with:
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event.pull_request.head.ref }}
+        ref: ${{ github.head_ref }}
 
-    - name: Test json stringify
+    - name: Get current version info and update it
       id: testfnc
       run: |
         CURRENT_VERSION=$(jq .version package.json | sed 's:^.\(.*\).$:\1:')
@@ -37,7 +32,7 @@ jobs:
         VER="${CURRENT_VERSION}"; sed -i "" "s|version\":.*|version\": \"${VER}\",|" package.json
         BUILD="${BUILD}"; sed -i "" "s|build\":.*|build\": \"${BUILD}\",|" package.json
 
-    - name: Updated package.json
+    - name: Show updated package.json
       run: |
         echo "::debug::Show package.json"
         cat package.json
@@ -45,8 +40,7 @@ jobs:
     - name: Test the output
       run: |
         echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
-        echo "::debug::Branch:${{steps.extract_branch.branch}}"
-        echo "::debug::REF:${{ github.event.pull_request.head.ref }}"
+        echo "::debug::REF:${{github.head_ref}}"
 
 
     # - name: Tag and commit
