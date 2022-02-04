@@ -13,21 +13,7 @@ jobs:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
     
-    # - name: Get the SHA
-    #   id: sha
-    #   uses: actions/github-script@v4
-    #   with:
-    #     result-encoding: string
-    #     script: |
-    #       const { owner, repo, number } = context.issue;
-    #       const pr = await github.pulls.get({
-    #         owner,
-    #         repo,
-    #         pull_number: number,
-    #       });
-    #       return pr.data.head.sha
     - name: Extract branch name
-      # run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       run: echo ::set-output name=branch::"${GITHUB_REF#refs/heads/}"
       id: extract_branch
 
@@ -57,47 +43,51 @@ jobs:
         cat package.json
         
     - name: Test the output
-      run: echo "::debug::Set the Octocat variable  ===> ${{steps.testfnc.outputs.version}} (${{steps.testfnc.outputs.build}})"
+      run: |
+        echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
+        echo "::debug::Branch:${{steps.extract_branch.branch}}"
+        echo "::debug::REF:${{ github.event.pull_request.head.ref }}"
 
-    - name: Tag and commit
-      uses: EndBug/add-and-commit@v8
-      with:
-        tag: "v${{steps.testfnc.outputs.version}}-${{steps.testfnc.outputs.build}}"
-        message: 'Version updated to ${{steps.testfnc.outputs.version}}(${{steps.testfnc.outputs.build}})'
-        push: "origin ${{steps.extract_branch.branch}} --force"
 
-    - name: React to comment
-      uses: actions/github-script@v4
-      with:
-        script: |
-          const {owner, repo} = context.issue;
-          github.reactions.createForIssueComment({
-            owner,
-            repo,
-            comment_id: context.payload.comment.id,
-            content: "rocket",
-          });
+    # - name: Tag and commit
+    #   uses: EndBug/add-and-commit@v8
+    #   with:
+    #     tag: "v${{steps.testfnc.outputs.version}}-${{steps.testfnc.outputs.build}}"
+    #     message: 'Version updated to ${{steps.testfnc.outputs.version}}(${{steps.testfnc.outputs.build}})'
+    #     push: "origin ${{steps.extract_branch.branch}} --force"
 
-    - name: Message success
-      if: ${{ success() }}
-      uses: actions/github-script@v4
-      with:
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: 'Deployment succeeded! ✅',
-          });
+    # - name: React to comment
+    #   uses: actions/github-script@v4
+    #   with:
+    #     script: |
+    #       const {owner, repo} = context.issue;
+    #       github.reactions.createForIssueComment({
+    #         owner,
+    #         repo,
+    #         comment_id: context.payload.comment.id,
+    #         content: "rocket",
+    #       });
+
+    # - name: Message success
+    #   if: ${{ success() }}
+    #   uses: actions/github-script@v4
+    #   with:
+    #     script: |
+    #       github.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: 'Deployment succeeded! ✅',
+    #       });
     
-    - name: Message failure
-      if: ${{ failure() }}
-      uses: actions/github-script@v4
-      with:
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: 'Deployment failed! ❌',
-          });
+    # - name: Message failure
+      # if: ${{ failure() }}
+      # uses: actions/github-script@v4
+      # with:
+      #   script: |
+      #     github.issues.createComment({
+      #       issue_number: context.issue.number,
+      #       owner: context.repo.owner,
+      #       repo: context.repo.repo,
+      #       body: 'Deployment failed! ❌',
+      #     });
