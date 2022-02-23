@@ -32,8 +32,8 @@ jobs:
 
     - name: Console Output
       run: |
-        echo "::debug::Branch SHA ${steps.sha.outputs.result}"
-        echo "::debug::Branch Name ${steps.comment-branch.outputs.head_ref}"
+        echo "::debug::Branch SHA ${{steps.sha.outputs.result}}"
+        echo "::debug::Branch Name ${{steps.comment-branch.outputs.head_ref}}"
     
     - name: Checkout code
       uses: actions/checkout@v2
