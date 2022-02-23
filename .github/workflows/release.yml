@@ -12,10 +12,28 @@ jobs:
     
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release' }}
     steps:
+    - name: Get PR SHA
+      id: sha
+      uses: actions/github-script@v4
+      with:
+        result-encoding: string
+        script: |
+          const { owner, repo, number } = context.issue;
+          const pr = await github.pulls.get({
+            owner,
+            repo,
+            pull_number: number,
+          });
+          return pr.data.head.sha
 
     - name: Get current branch
       uses: xt0rted/pull-request-comment-branch@v1
       id: comment-branch
+
+    - name: Console Output
+      run: |
+        echo "::debug::Branch SHA ${steps.sha.outputs.result}"
+        echo "::debug::Branch Name ${steps.comment-branch.outputs.head_ref}"
     
     - name: Checkout code
       uses: actions/checkout@v2
@@ -37,34 +55,10 @@ jobs:
         VER="${CURRENT_VERSION}"; sed -i "" "s|version\":.*|version\": \"${VER}\",|" package.json
         BUILD="${BUILD}"; sed -i "" "s|build\":.*|build\": \"${BUILD}\",|" package.json
 
-    - name: Show updated package.json
-      run: |
-        echo "::debug::Show package.json"
-        cat package.json
-        
-    - name: Test the output
-      run: |
-        echo "::debug::github.event_name: ${{github.event_name}}"
-        echo "::debug::action_ref:${{github.action_ref}}"
-        echo "::debug::ref:${{github.ref}}"
-        echo "::debug::head_ref:${{github.head_ref}}"
-        echo "::debug::base_ref:${{github.base_ref}}"
-        echo "::debug::ref_name:${{github.ref_name}}"
-        echo "::debug::ref_type:${{github.ref_type}}"
-        echo "::debug::sha:${{github.sha}}"
-        echo "::debug::comment-branch:${{steps.comment-branch.outputs.head_ref}}"
-        echo "::debug::Version:${{steps.testfnc.outputs.version}} Build:${{steps.testfnc.outputs.build}}"
-
-    # - name: Bump iOS version
-    #   uses: yanamura/ios-bump-version@v1
-    #   with:
-    #     version: ${{steps.testfnc.outputs.version}}
-    #     build-number: ${{steps.testfnc.outputs.build}}
-    #     project-path: ios #Example for React Native project
-
-    - name: Bump iOS version myself
+    - name: Bump iOS version
       run: |
         sed -i '' -e 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{steps.testfnc.outputs.version}};/' ios/githubactions.xcodeproj/project.pbxproj
+        sed -i '' -e 's/CURRENT_PROJECT_VERSION \= [^\;]*\;/CURRENT_PROJECT_VERSION = ${{steps.testfnc.outputs.version}};/' ios/githubactions.xcodeproj/project.pbxproj
         cd ios
         xcrun agvtool new-version ${{steps.testfnc.outputs.build}}
         cd ..
